@@ -2,7 +2,7 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import csvWriter from "csv-write-stream";
 
-// thereporterz website
+// tmzworldnews website
 
 let titles = [];
 let dates = [];
@@ -16,7 +16,7 @@ function displayDetails(titles, dates, links) {
 }
 
 function addToCSV(titles, texts) {
-    let filePath = "./fake/fake_thereporterz_content.csv";
+    let filePath = "./fake/fake_tmzworldnews_content.csv";
     let log = csvWriter({ sendHeaders: false });
     if (!fs.existsSync(filePath))
         log = csvWriter({ headers: ["Title", "Len", "Content"] });
@@ -33,7 +33,7 @@ function addToCSV(titles, texts) {
 }
 
 function addToCSVNoTexts(titles, dates, links) {
-    let filePath = "./fake/fake_thereporterz_title.csv";
+    let filePath = "./fake/fake_tmzworldnews_title.csv";
     let log = csvWriter({ sendHeaders: false });
     if (!fs.existsSync(filePath))
         log = csvWriter({ headers: ["Title", "Publishing Date", "Source"] });
@@ -60,7 +60,7 @@ function addToCSVNoTexts(titles, dates, links) {
 
 function grabText() {
     let lst_ = [];
-    document.querySelectorAll("div.entry-content > p").forEach((el) => {
+    document.querySelectorAll(".entry-content > p").forEach((el) => {
         text = el.innerText;
         if (text.length != 0) {
             lst_.push(text)
@@ -75,15 +75,11 @@ async function textExtract(URL) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
-    try {
-        await page.goto(URL, { waitUntil: 'load', timeout: 4 * 60 * 1000 });
-        let textData = await page.evaluate(grabText);
-        await browser.close();
+    await page.goto(URL, { waitUntil: 'load', timeout: 4 * 60 * 1000 });
+    let textData = await page.evaluate(grabText);
+    await browser.close();
 
-        return textData;
-    }  catch(e) {
-        return "";
-    }
+    return textData;
 
 }
 
@@ -92,12 +88,12 @@ function detailsExtract() {
     let dates = [];
     let links = [];
 
-    document.querySelectorAll("div.inside-article header h2.entry-title a").forEach((el) => {
+    document.querySelectorAll("div.p-header h2.entry-title a").forEach((el) => {
         titles.push(el.innerText);
         links.push(el.href);
     });
 
-    document.querySelectorAll("div.inside-article header span.posted-on time").forEach((el) => {
+    document.querySelectorAll("div.content-wrap div.p-footer aside span.meta-info-date").forEach((el) => {
         dates.push(el.innerText);
     });
 
@@ -109,10 +105,10 @@ async function paginationAndScrape() {
     console.log("Pagination scrape");
     let size = 10;
 
-    for (let page_ = 14; page_ < 39; ++page_) {
+    for (let page_ = 1; page_ < 4; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size;
-        let URL = `https://thereporterz.com/page/${page_ + 1}/?s=health`;
+        let URL = `https://tmzworldnews.com/category/health/page/${page_+1}/`;
 
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
@@ -143,30 +139,30 @@ async function paginationAndScrape() {
 }
 
 async function extractPostDetails() {
-    const URL = 'https://thereporterz.com/?s=health';
+    const URL = 'https://tmzworldnews.com/category/health/';
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     await page.goto(URL, { waitUntil: 'load', timeout: 0 });
     // first page already scraped
 
-    // let data = await page.evaluate(detailsExtract);
-    // addToCSVNoTexts(data.titles, data.dates, data.links);
+    let data = await page.evaluate(detailsExtract);
+    addToCSVNoTexts(data.titles, data.dates, data.links);
 
-    // let rows = data.links.length;
-    // for (let row = 0; row < rows; ++row) {
-    //     console.log(`Find the textual content for link ${row + 1}`);
-    //     let link = data.links[row];
-    //     let text = await textExtract(link);
+    let rows = data.links.length;
+    for (let row = 0; row < rows; ++row) {
+        console.log(`Find the textual content for link ${row + 1}`);
+        let link = data.links[row];
+        let text = await textExtract(link);
 
-    //     if (text.length != 0)
-    //         addToCSV(data.titles[row], text);
-    // }
+        if (text.length != 0)
+            addToCSV(data.titles[row], text);
+    }
 
-    // titles = titles.concat(data.titles);
-    // links = links.concat(data.links);
-    // dates = dates.concat(data.dates);
-    // displayDetails(titles, dates, links);
+    titles = titles.concat(data.titles);
+    links = links.concat(data.links);
+    dates = dates.concat(data.dates);
+    displayDetails(titles, dates, links);
 
     await page.exposeFunction("paginationAndScrape", paginationAndScrape);
     await page.evaluate(async () => {

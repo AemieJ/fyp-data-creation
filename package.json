@@ -11,7 +11,10 @@
     "fake_2": "node fake_crawl_2.js",
     "fake_3": "node fake_crawl_3.js",
     "fake_4": "node fake_crawl_4.js",
-    "fake_5": "node fake_crawl_5.js"
+    "fake_5": "node fake_crawl_5.js",
+    "fake_6": "node fake_crawl_6.js",
+    "fake_7": "node fake_crawl_7.js",
+    "fake_8": "node fake_crawl_8.js"
   },
   "author": "",
   "license": "ISC",
