@@ -14,6 +14,9 @@ within the `/fake` folder.
 8. TMZ World News
 9. The Skunk 
 10. World news daily report
+11. Reductress
+12. News Biscuit
+13. fmobserver
 
 ## List of real news website
 Each fake news crawling code is present in the `/real_crawls` folder and each csv file is saved

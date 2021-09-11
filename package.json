@@ -20,7 +20,10 @@
     "fake_9": "cd fake_crawls && node fake_crawl_9.js",
     "fake_10": "cd fake_crawls && node fake_crawl_10.js",
     "fake_11": "cd fake_crawls && node fake_crawl_11.js",
-    "fake_12": "cd fake_crawls && node fake_crawl_12.js"
+    "fake_12": "cd fake_crawls && node fake_crawl_12.js",
+    "fake_13": "cd fake_crawls && node fake_crawl_13.js",
+    "fake_14": "cd fake_crawls && node fake_crawl_14.js",
+    "fake_15": "cd fake_crawls && node fake_crawl_15.js"
   },
   "author": "",
   "license": "ISC",
