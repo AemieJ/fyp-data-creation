@@ -26,3 +26,5 @@ within the `/real` folder.
 2. Reuters
 3. NBC News
 4. The Atlantic
+5. Times of India
+6. The New Yorker

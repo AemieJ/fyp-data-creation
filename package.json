@@ -9,6 +9,8 @@
     "real_2": "cd real_crawls && node real_crawl_2.js",
     "real_3": "cd real_crawls && node real_crawl_3.js",
     "real_4": "cd real_crawls && node real_crawl_4.js",
+    "real_5": "cd real_crawls && node real_crawl_5.js",
+    "real_6": "cd real_crawls && node real_crawl_6.js",
     "fake_1": "cd fake_crawls && node fake_crawl_1.js",
     "fake_2": "cd fake_crawls && node fake_crawl_2.js",
     "fake_3": "cd fake_crawls && node fake_crawl_3.js",

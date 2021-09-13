@@ -2,7 +2,7 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 import csvWriter from "csv-write-stream";
 
-// reuters website
+// the newyorker website
 
 let titles = [];
 let dates = [];
@@ -16,7 +16,7 @@ function displayDetails(titles, dates, links) {
 }
 
 function addToCSV(titles, texts) {
-    let filePath = "./real/real_reuters_content.csv";
+    let filePath = "../real/real_newyorker_content.csv";
     let log = csvWriter({sendHeaders: false});
     if (!fs.existsSync(filePath))
         log = csvWriter({ headers: ["Title", "Len", "Content"]});
@@ -33,7 +33,7 @@ function addToCSV(titles, texts) {
 }
 
 function addToCSVNoTexts(titles, dates, links) {
-    let filePath = "./real/real_reuters_title.csv";
+    let filePath = "../real/real_newyorker_title.csv";
     let log = csvWriter({sendHeaders: false});
     if (!fs.existsSync(filePath))
         log = csvWriter({ headers: ["Title", "Publishing Date", "Source"]});
@@ -60,12 +60,13 @@ function addToCSVNoTexts(titles, dates, links) {
 
 function grabText() {
     let lst_ = [];
-    document.querySelectorAll(".paywall-article p").forEach((el) => {
+    document.querySelectorAll("div.grid-margins p").forEach((el) => {
         text = el.innerText; 
         if (text.length != 0) { 
             lst_.push(text)
         }
     });
+
     return lst_.join(" ");
 }
 
@@ -89,10 +90,13 @@ function detailsExtract() {
     let dates = [];
     let links = [];
 
-    document.querySelectorAll(".SearchResults__sectionContainer___Gd1afW li a").forEach((el) => {
-        titles.push(el.querySelector("h6").innerText);
+    document.querySelectorAll("li.River__riverItem___3huWr div div.River__riverItemBody___347sz > a").forEach((el) => {
+        titles.push(el.getAttribute("aria-label"));
         links.push(el.href);
-        dates.push(el.querySelector("time").innerText.split("·")[0]);
+    });
+
+    document.querySelectorAll("h6.River__publishDate___1fSSK").forEach((el) => {
+        dates.push(el.innerText);
     });
 
     return { titles, dates, links };
@@ -101,12 +105,12 @@ function detailsExtract() {
 
 async function paginationAndScrape(totalPages) {
     console.log("Pagination scrape");
-    let size = 10;
+    let size = 18;
 
-    for (let page_ = 12; page_ < 200; ++page_) {
+    for (let page_ = 1; page_ < 19; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size; 
-        let URL = `https://www.reuters.com/site-search/?query=health&sort=newest&offset=${from_}`;
+        let URL = `https://www.newyorker.com/search/q/healthcare/page/${page_ + 1}/r,n`;
 
         const browser = await puppeteer.launch();
         const page = await browser.newPage();
@@ -135,41 +139,35 @@ async function paginationAndScrape(totalPages) {
     }
 }
 
-// get maximum pages 
-function totalTitle() {
-    let length = document.querySelector(".SearchResults__subtitle___zxFMs2 span.count").innerText.split(" ")[0];
-    return parseInt(length);
-}
 
 async function extractPostDetails() {
 	try {
-		const URL = 'https://www.reuters.com/site-search/?query=health&sort=newest&offset=0';
+		const URL = 'https://www.newyorker.com/search/q/healthcare';
 		const browser = await puppeteer.launch();
 		const page = await browser.newPage();
 
         await page.goto(URL, {waitUntil: 'load', timeout: 0});
 
-        let totalTitles = await  page.evaluate(totalTitle); 
-        let totalPages = Math.ceil(totalTitles / 10);
+        let totalPages = 19;
         console.log(`Total pages: ${totalPages}`);
         // first page already scraped
 
-        // let data = await page.evaluate(detailsExtract);
-        // addToCSVNoTexts(data.titles, data.dates, data.links);
+        let data = await page.evaluate(detailsExtract);
+        addToCSVNoTexts(data.titles, data.dates, data.links);
 
-        // let rows = data.links.length;
-        // for (let row = 0; row < rows; ++row) {
-        //     console.log(`Find the textual content for link ${row+1}`);
-        //     let link = data.links[row];
-        //     let text = await textExtract(link);
+        let rows = data.links.length;
+        for (let row = 0; row < rows; ++row) {
+            console.log(`Find the textual content for link ${row+1}`);
+            let link = data.links[row];
+            let text = await textExtract(link);
             
-        //     addToCSV(data.titles[row], text);
-        // }
+            addToCSV(data.titles[row], text);
+        }
 
-        // titles = titles.concat(data.titles);
-        // links = links.concat(data.links);
-        // dates = dates.concat(data.dates);
-        // displayDetails(titles, dates, links);
+        titles = titles.concat(data.titles);
+        links = links.concat(data.links);
+        dates = dates.concat(data.dates);
+        displayDetails(titles, dates, links);
 
         await page.exposeFunction("paginationAndScrape", paginationAndScrape);
         await page.evaluate(async (totalPages) => {
