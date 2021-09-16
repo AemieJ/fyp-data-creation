@@ -105,7 +105,7 @@ async function paginationAndScrape(totalPages) {
     console.log("Pagination scrape");
     let size = 10;
 
-    for (let page_ = 227; page_ < 1000; ++page_) {
+    for (let page_ = 300; page_ < 1000; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size; 
         let URL = `https://edition.cnn.com/search?size=10&q=health&category=health&from=${from_}&page=${page_ + 1}`;
