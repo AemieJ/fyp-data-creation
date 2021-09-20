@@ -103,7 +103,7 @@ async function paginationAndScrape(totalPages) {
     console.log("Pagination scrape");
     let size = 10;
 
-    for (let page_ = 12; page_ < 200; ++page_) {
+    for (let page_ = 161; page_ < 200; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size; 
         let URL = `https://www.reuters.com/site-search/?query=health&sort=newest&offset=${from_}`;

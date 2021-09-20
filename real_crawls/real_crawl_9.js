@@ -107,7 +107,7 @@ async function paginationAndScrape(totalPages) {
     console.log("Pagination scrape");
     let size = 20;
 
-    for (let page_ = 1; page_ < 570; ++page_) {
+    for (let page_ = 192; page_ < 570; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size; 
         let URL = `https://www.politico.com/search/${page_ + 1}?q=healthcare`;
@@ -152,22 +152,22 @@ async function extractPostDetails() {
         console.log(`Total pages: ${totalPages}`);
         // first page already scraped
 
-        let data = await page.evaluate(detailsExtract);
-        addToCSVNoTexts(data.titles, data.dates, data.links);
+        // let data = await page.evaluate(detailsExtract);
+        // addToCSVNoTexts(data.titles, data.dates, data.links);
 
-        let rows = data.links.length;
-        for (let row = 0; row < rows; ++row) {
-            console.log(`Find the textual content for link ${row+1}`);
-            let link = data.links[row];
-            let text = await textExtract(link);
+        // let rows = data.links.length;
+        // for (let row = 0; row < rows; ++row) {
+        //     console.log(`Find the textual content for link ${row+1}`);
+        //     let link = data.links[row];
+        //     let text = await textExtract(link);
             
-            addToCSV(data.titles[row], text);
-        }
+        //     addToCSV(data.titles[row], text);
+        // }
 
-        titles = titles.concat(data.titles);
-        links = links.concat(data.links);
-        dates = dates.concat(data.dates);
-        displayDetails(titles, dates, links);
+        // titles = titles.concat(data.titles);
+        // links = links.concat(data.links);
+        // dates = dates.concat(data.dates);
+        // displayDetails(titles, dates, links);
 
         await page.exposeFunction("paginationAndScrape", paginationAndScrape);
         await page.evaluate(async (totalPages) => {
