@@ -107,7 +107,7 @@ async function paginationAndScrape(totalPages) {
     console.log("Pagination scrape");
     let size = 20;
 
-    for (let page_ = 192; page_ < 570; ++page_) {
+    for (let page_ = 224; page_ < 570; ++page_) {
         console.log(`Scraping through page: ${page_ + 1}`);
         let from_ = page_ * size; 
         let URL = `https://www.politico.com/search/${page_ + 1}?q=healthcare`;
